@@ -1,3 +1,30 @@
+moonplayer (2.9.2-1~bionic) bionic; urgency=medium
+
+  * v2.9.2
+  * Compatible with latest version of Ykdl
+
+ -- YK Liu <cos.lyk@gmail.com>  Wed, 04 Dec 2019 16:17:30 +0100
+
+moonplayer (2.9-1~bionic) bionic; urgency=medium
+
+  * v2.9
+  * Add classic UI
+  * The equalizer's values can be more precise now
+
+ -- YK Liu <cos.lyk@gmail.com>  Wed, 23 Oct 2019 19:24:41 +0200
+
+moonplayer (2.8-1~bionic) bionic; urgency=medium
+
+  * v2.8
+  * Add option: use proxy only for parsing
+  * Add socks5 proxy support for hls downloader and ykdl
+  * Add support for parsing playlist url
+  * Fix: The plugins path for FreeBSD
+  * Fix: Use proxy on local hosts
+  * Other bug fixes and improvements
+
+ -- YK Liu <cos.lyk@gmail.com>  Wed, 07 Aug 2019 17:42:53 +0200
+
 moonplayer (2.7-1~bionic) bionic; urgency=medium
 
   * v2.7

@@ -34,6 +34,8 @@ int Settings::durationStill;
 bool Settings::copyMode;
 bool Settings::rememberUnfinished;
 bool Settings::autoCombine;
+bool Settings::proxyOnlyForParsing;
+bool Settings::classicUI;
 double Settings::danmakuAlpha;
 Settings::URLOpenMode Settings::urlOpenMode;
 
@@ -81,6 +83,8 @@ void SettingsDialog::loadSettings()
     ui->rememberCheckBox->setChecked(rememberUnfinished);
     ui->combineCheckBox->setChecked(autoCombine);
     ui->copyModeCheckBox->setChecked(copyMode);
+    ui->proxyParsingOnlyCheckBox->setChecked(proxyOnlyForParsing);
+    ui->classicUICheckBox->setChecked(classicUI);
 
     ui->alphaDoubleSpinBox->setValue(danmakuAlpha);
     ui->fontPushButton->setText(danmakuFont);
@@ -145,6 +149,8 @@ void SettingsDialog::saveSettings()
     rememberUnfinished = ui->rememberCheckBox->isChecked();
     autoCombine = ui->combineCheckBox->isChecked();
     copyMode = ui->copyModeCheckBox->isChecked();
+    proxyOnlyForParsing = ui->proxyParsingOnlyCheckBox->isChecked();
+    classicUI = ui->classicUICheckBox->isChecked();
 
     danmakuAlpha = ui->alphaDoubleSpinBox->value();
     danmakuFont = ui->fontPushButton->text();
@@ -163,12 +169,14 @@ SettingsDialog::~SettingsDialog()
 
     settings.setValue("Player/remember_unfinished", rememberUnfinished);
     settings.setValue("Player/url_open_mode", (int) urlOpenMode);
+    settings.setValue("Player/classic_ui", classicUI);
     settings.setValue("Video/copy_mode", copyMode);
     settings.setValue("Video/hwdec", hwdec);
     settings.setValue("Audio/out", aout);
     settings.setValue("Audio/volume", volume);
     settings.setValue("Net/proxy_type", proxyType);
     settings.setValue("Net/proxy", proxy);
+    settings.setValue("Net/proxy_only_for_parsing", proxyOnlyForParsing);
     settings.setValue("Net/port", port);
     settings.setValue("Net/max_tasks", maxTasks);
     settings.setValue("Net/download_dir", downloadDir);
@@ -194,11 +202,13 @@ void initSettings()
     hwdec = settings.value("Video/hwdec", "auto").toString();
     aout = settings.value("Audio/out", "auto").toString();
     volume = settings.value("Audio/volume", 10).toInt();
+    classicUI = settings.value("Player/classic_ui", false).toBool();
     rememberUnfinished = settings.value("Player/remember_unfinished", true).toBool();
     urlOpenMode = (Settings::URLOpenMode) settings.value("Player/url_open_mode", 0).toInt();
     proxyType = settings.value("Net/proxy_type", "no").toString();
     proxy = settings.value("Net/proxy").toString();
     port = settings.value("Net/port").toInt();
+    proxyOnlyForParsing = settings.value("Net/proxy_only_for_parsing", false).toBool();
     maxTasks = settings.value("Net/max_tasks", 3).toInt();
     autoCombine = settings.value("Plugins/auto_combine", true).toBool();
     copyMode = settings.value("Video/copy_mode", false).toBool();

@@ -57,6 +57,7 @@ void ParserYoutubeDL::runParser(const QString &url)
         args << "--proxy" << (Settings::proxy + ':' + QString::number(Settings::port));
     else if (!Settings::proxy.isEmpty() && Settings::proxyType == "socks5")
         args << "--proxy" << QString("socks5://%1:%2/").arg(Settings::proxy, QString::number(Settings::port));
+
     args << url;
     process->start(PYTHON_BIN, args, QProcess::ReadOnly);
     msgWindow->show();

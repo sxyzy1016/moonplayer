@@ -7,8 +7,11 @@
 ### Config
 # QtWebEngine (Chromium) intergration, set ENABLE_WEBENGINE=no to disable it
 !defined(ENABLE_WEBENGINE,var) {
-    qtHaveModule(webenginewidgets): ENABLE_WEBENGINE=yes
-    !qtHaveModule(webenginewidgets): ENABLE_WEBENGINE=no
+    equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 9): ENABLE_WEBENGINE=no
+    equals(QT_MAJOR_VERSION, 5):!lessThan(QT_MINOR_VERSION, 9) {
+        qtHaveModule(webenginewidgets): ENABLE_WEBENGINE=yes
+        !qtHaveModule(webenginewidgets): ENABLE_WEBENGINE=no
+    }
 }
 
 # Library paths on Windows
@@ -20,6 +23,9 @@ win32 {
 
 QT += core gui network xml widgets
 unix:!macx: QT += gui-private x11extras
+
+# Enable c++ lambda
+CONFIG += c++14
 
 macx:  TARGET = MoonPlayer
 !macx: TARGET = moonplayer
@@ -37,14 +43,15 @@ SOURCES += \
     downloaderitem.cpp \
     httpget.cpp \
     main.cpp \
+    modernwindow.cpp \
     mybuttongroup.cpp \
     mylistwidget.cpp \
     parserbase.cpp \
     parserykdl.cpp \
     parseryoutubedl.cpp \
     playercore.cpp \
-    playerview.cpp \
     playlist.cpp \
+    proxyfactory.cpp \
     pyapi.cpp \
     python_wrapper.cpp \
     reslibrary.cpp \
@@ -56,7 +63,9 @@ SOURCES += \
     upgraderdialog.cpp \
     utils.cpp \
     videocombiner.cpp \
-    platform/paths.cpp
+    windowbase.cpp \
+    platform/paths.cpp \
+    classicwindow.cpp
 
 HEADERS  +=\
     aboutdialog.h \
@@ -68,14 +77,15 @@ HEADERS  +=\
     downloader.h \
     downloaderitem.h \
     httpget.h \
+    modernwindow.h \
     mybuttongroup.h \
     mylistwidget.h \
     parserbase.h \
     parserykdl.h \
     parseryoutubedl.h \
     playercore.h \
-    playerview.h \
     playlist.h \
+    proxyfactory.h \
     pyapi.h \
     python_wrapper.h \
     reslibrary.h \
@@ -92,9 +102,11 @@ HEADERS  +=\
     upgraderdialog.h \
     utils.h \
     videocombiner.h \
+    windowbase.h \
     platform/application.h \
     platform/detectopengl.h \
-    platform/paths.h
+    platform/paths.h \
+    classicwindow.h
 
 
 # Platform specific source codes
@@ -122,10 +134,12 @@ win32 {
 # QtWebEngine Support (Mainly used for parsing youku videos)
 equals(ENABLE_WEBENGINE, "yes") {
     QT += websockets webenginewidgets
-    HEADERS += chromiumdebugger.h \
+    HEADERS += \
+               chromiumdebugger.h \
                extractor.h \
                parserwebcatch.h
-    SOURCES += chromiumdebugger.cpp \
+    SOURCES += \
+               chromiumdebugger.cpp \
                extractor.cpp \
                parserwebcatch.cpp
     DEFINES += MP_ENABLE_WEBENGINE
@@ -137,15 +151,17 @@ TRANSLATIONS += translations/moonplayer_zh_CN.ts
 
 
 FORMS    += \
+    classicwindow.ui \
     playlist.ui \
     settingsdialog.ui \
     reslibrary.ui \
     detailview.ui \
     cutterbar.ui \
     selectiondialog.ui \
-    playerview.ui \
     aboutdialog.ui \
-    upgraderdialog.ui
+    upgraderdialog.ui \
+    modernwindow.ui \
+    equalizer.ui
 
 
 RESOURCES += \
@@ -159,7 +175,7 @@ unix:!macx {
     isEmpty(BINDIR) {
         BINDIR = bin
     }
-    usr_share.files += plugins unblockcn translations
+    usr_share.files += plugins translations
     usr_share.path = $$PREFIX/share/moonplayer
     #icon
     icon.files += icons/*
@@ -180,7 +196,7 @@ unix:!macx {
 macx {
     FFMPEG.files = /usr/local/bin/ffmpeg
     FFMPEG.path = Contents/MacOS
-    RESFILES.files = plugins unblockcn translations
+    RESFILES.files = plugins translations
     RESFILES.path = Contents/Resources
     QT_TRANS.files = /usr/local/opt/qt/translations
     QT_TRANS.path = Contents/Resources/qt

@@ -13,5 +13,11 @@
         <file>moonplayer.png</file>
         <file>qrcodes/alipay.png</file>
         <file>qrcodes/wechatpay.png</file>
+        <file>classic_ui/net.png</file>
+        <file>classic_ui/pause.png</file>
+        <file>classic_ui/play.png</file>
+        <file>classic_ui/stop.png</file>
+        <file>classic_ui/volume.png</file>
+        <file>classic_ui/playlist.png</file>
     </qresource>
 </RCC>

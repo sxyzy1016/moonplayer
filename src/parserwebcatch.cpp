@@ -2,6 +2,7 @@
 #include <QNetworkCookieJar>
 #include <QNetworkReply>
 #include <QWebEngineCookieStore>
+#include <QWebEngineHttpRequest>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
 #include <QWebEngineView>
@@ -21,7 +22,6 @@ ParserWebCatch::ParserWebCatch(QObject *parent) :
     // set profile
     QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
     profile->setHttpUserAgent(DEFAULT_UA);
-    profile->settings()->setAttribute(QWebEngineSettings::AutoLoadImages, false);
     profile->settings()->setAttribute(QWebEngineSettings::AutoLoadIconsForPage, false);
     connect(profile->cookieStore(), &QWebEngineCookieStore::cookieAdded, this, &ParserWebCatch::onCookieAdded);
     profile->cookieStore()->loadAllCookies();
@@ -55,6 +55,8 @@ void ParserWebCatch::runParser(const QString &url)
     }
 
     // load url
+    QWebEngineHttpRequest request(url);
+    request.setHeader("Referer", url.toUtf8());
     webengineView->setUrl(QUrl(url));
     webengineView->show();
 }

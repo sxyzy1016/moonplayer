@@ -5,6 +5,8 @@
 #include <QNetworkAccessManager>
 #include <QUrl>
 
+class ProxyFactory;
+
 class NetworkAccessManager : public QNetworkAccessManager
 {
     Q_OBJECT
@@ -14,9 +16,8 @@ public:
     void setProxy(const QString &proxyType, const QString &proxy, int port);
 
 private:
-    QStringList header_urls;
-    QStringList proxy_urls;
-    QNetworkAccessManager *amForUnblock;
+    ProxyFactory *m_proxyFactory;
+    ProxyFactory *m_webengineProxyFactory;
 };
 
 extern NetworkAccessManager *access_manager;

@@ -1,14 +1,16 @@
 #include "parserykdl.h"
+#include "accessmanager.h"
 #include "platform/paths.h"
 #include "python_wrapper.h"
 #include "settings_network.h"
 #include <QDir>
 #include <QGridLayout>
-#include <QLabel>
+#include <QInputDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
+#include <QLabel>
 #include <QMessageBox>
 #include <QProcess>
 
@@ -59,10 +61,12 @@ void ParserYkdl::runParser(const QString &url)
 
     QStringList args;
     args << (getAppPath() + "/plugins/ykdl_patched.py");
-    args << "-t" << "15" << "--json";
-    if (!Settings::proxy.isEmpty() &&
-            (Settings::proxyType == "http" || (Settings::proxyType == "http_unblockcn")))
-        args << "--proxy" << (Settings::proxy + ':' + QString::number(Settings::port));
+    args << "--timeout" << "15" << "--user-agent" << DEFAULT_UA;
+    if (!Settings::proxy.isEmpty() && Settings::proxyType == "http")
+        args << "--http-proxy" << (Settings::proxy + ':' + QString::number(Settings::port));
+    else if (!Settings::proxy.isEmpty() && Settings::proxyType == "socks5")
+        args << "--socks-proxy" << (Settings::proxy + ':' + QString::number(Settings::port));
+
     args << url;
     process->start(PYTHON_BIN, args, QProcess::ReadOnly);
     msgWindow->show();
@@ -74,12 +78,39 @@ void ParserYkdl::parseOutput()
     msgWindow->close();
     QByteArray output = process->readAllStandardOutput();
     QJsonParseError json_error;
-    QJsonObject obj = QJsonDocument::fromJson(output, &json_error).object();
+    QJsonDocument document = QJsonDocument::fromJson(output, &json_error);
+
     if (json_error.error != QJsonParseError::NoError)
     {
         showErrorDialog(QString::fromUtf8(process->readAllStandardError()));
         return;
     }
+
+    // select episode
+    if (document.isArray())
+    {
+        QJsonArray episodes = document.array();
+        QStringList titles, urls;
+        foreach (QJsonValue item, episodes)
+        {
+            titles << item.toObject()["title"].toString();
+            urls << item.toObject()["url"].toString();
+        }
+        bool ok = false;
+        QString selected = QInputDialog::getItem(NULL, "Select episode",
+                                             tr("Please select episode:"),
+                                             titles,
+                                             0,
+                                             false,
+                                             &ok);
+        if (!ok)
+            return;
+        QString url = urls[titles.indexOf(selected)];
+        runParser(url);
+        return;
+    }
+
+    QJsonObject obj = document.object();
     if (obj.contains("streams"))
     {
         result.title = obj["title"].toString();
